@@ -46,7 +46,7 @@ public class WindowGeneBank extends WindowMachine {
     protected ControlGeneScroll genes;
 
     public WindowGeneBank(EntityPlayer player, IInventory inventory, Side side, boolean isNEI) {
-        super(320, 224, player, inventory, side);
+        super(400, 224, player, inventory, side);
         isNei = isNEI;
     }
 
@@ -55,8 +55,8 @@ public class WindowGeneBank extends WindowMachine {
     }
 
     @Override
-    public void recieveGuiNBT(Side side, EntityPlayer player, String name, NBTTagCompound nbt) {
-        super.recieveGuiNBT(side, player, name, nbt);
+    public void receiveGuiNBT(Side side, EntityPlayer player, String name, NBTTagCompound nbt) {
+        super.receiveGuiNBT(side, player, name, nbt);
         if (side != Side.SERVER || !name.equals("gene-select")) {
             return;
         }
@@ -97,10 +97,10 @@ public class WindowGeneBank extends WindowMachine {
         int boxX;
         int x = 16;
         int y = 32;
-        new ControlPlayerInventory(this, x, y);
+        new ControlPlayerInventory(this, x, y).createAndRegister();
         x += 124;
         boxX = x;
-        int geneBoxWidth = 120;
+        int geneBoxWidth = 200;
         new Panel(this, boxX + 24, 32.0f, geneBoxWidth, 120.0f, MinecraftGUI.PanelType.Black);
         new Panel(this, boxX + 24 + geneBoxWidth, 32.0f, 14.0f, 120.0f, MinecraftGUI.PanelType.Gray);
         ControlScrollableContent scroll = new ControlScrollableContent(

@@ -2,6 +2,7 @@ package binnie.extratrees.craftgui;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.nbt.NBTTagList;
 
 import binnie.core.AbstractMod;
 import binnie.core.craftgui.controls.ControlText;
@@ -12,6 +13,7 @@ import binnie.core.craftgui.events.EventTextEdit;
 import binnie.core.craftgui.geometry.IArea;
 import binnie.core.craftgui.geometry.IPoint;
 import binnie.core.craftgui.geometry.TextJustification;
+import binnie.core.craftgui.minecraft.InventoryType;
 import binnie.core.craftgui.minecraft.MinecraftGUI;
 import binnie.core.craftgui.minecraft.Window;
 import binnie.core.craftgui.minecraft.control.ControlErrorState;
@@ -19,6 +21,7 @@ import binnie.core.craftgui.minecraft.control.ControlPlayerInventory;
 import binnie.core.craftgui.minecraft.control.ControlSlot;
 import binnie.core.craftgui.window.Panel;
 import binnie.core.machines.Machine;
+import binnie.core.network.packet.MessageCraftGUI;
 import binnie.core.util.I18N;
 import binnie.extratrees.ExtraTrees;
 import binnie.extratrees.machines.designer.Designer;
@@ -48,7 +51,9 @@ public class WindowWoodworker extends Window {
 
     @Override
     public void initialiseClient() {
-        setTitle(Machine.getMachine(getInventory()).getPackage().getDisplayName());
+        final NBTTagList actions = new NBTTagList();
+
+        setTitle(Machine.getMachine(getInventory()).getPackage().getGuiDisplayName());
         new ControlText(
                 this,
                 new IArea(190.0f, 36.0f, 114.0f, 10.0f),
@@ -58,18 +63,25 @@ public class WindowWoodworker extends Window {
         textEdit = new ControlTextEdit(this, 188.0f, 178.0f, 118.0f, 12.0f);
         ControlScrollableContent scroll = new ControlScrollableContent(this, 190.0f, 50.0f, 114.0f, 122.0f, 12.0f);
         scroll.setScrollableContent(tileSelect = new ControlTileSelect(scroll, 0.0f, 0.0f));
-        new ControlPlayerInventory(this).setPosition(new IPoint(14.0f, 96.0f));
+
+        ControlPlayerInventory controlPlayerInventory = new ControlPlayerInventory(this);
+        controlPlayerInventory.setPosition(new IPoint(14.0f, 96.0f));
+        controlPlayerInventory.create(actions);
+
         new ControlErrorState(this, 76.0f, 65.0f);
 
         if (getInventory() != null) {
+
             ControlSlot slotWood1 = new ControlSlot(this, 22.0f, 34.0f);
-            slotWood1.assign(Designer.DESIGN_1_SLOT);
+            slotWood1.assign(actions, InventoryType.Machine, Designer.DESIGN_1_SLOT);
             ControlSlot slotWood2 = new ControlSlot(this, 62.0f, 34.0f);
-            slotWood2.assign(Designer.DESIGN_2_SLOT);
+            slotWood2.assign(actions, InventoryType.Machine, Designer.DESIGN_2_SLOT);
             ControlSlot slotBeeswax = new ControlSlot(this, 42.0f, 64.0f);
-            slotBeeswax.assign(Designer.GLUE_SLOT);
+            slotBeeswax.assign(actions, InventoryType.Machine, Designer.GLUE_SLOT);
             new ControlRecipeSlot(this, 112, 34);
         }
+
+        MessageCraftGUI.sendToServer(actions);
     }
 
     @Override

@@ -19,12 +19,14 @@ public class ItemETStairs extends ItemBlock {
         super(block);
         setCreativeTab(CreativeTabs.tabBlock);
         setUnlocalizedName("stairs");
+        setMaxDamage(0);
+        setHasSubtypes(true);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIconFromDamage(int par1) {
-        return PlankType.ExtraTreePlanks.values()[par1].getIcon();
+        return PlankType.ExtraTreePlanks.VALUES[par1].getIcon();
     }
 
     @Override

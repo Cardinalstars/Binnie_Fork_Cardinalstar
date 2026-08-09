@@ -54,7 +54,7 @@ public enum Food implements IItemMisc {
     Acorn(0),
     Elderberry(1),
     Olive(1),
-    GingkoNut(1),
+    GinkgoNut(1),
     Coffee(0),
     OsangeOrange(1),
     Clove(0),
@@ -79,6 +79,10 @@ public enum Food implements IItemMisc {
     Starfruit(2),
     Candlenut(0);
 
+    /**
+     * Cached values() array for frequent read-only operations, the array should NOT be mutated.
+     */
+    public static final Food[] VALUES = values();
     private IIcon icon;
     private final int hunger;
     private final List<String> ores;
@@ -125,7 +129,7 @@ public enum Food implements IItemMisc {
         Food.Acorn.ore("Acorn");
         Food.Elderberry.ore("Elderberry");
         Food.Olive.ore("Olive");
-        Food.GingkoNut.ore("GingkoNut");
+        Food.GinkgoNut.ore("GinkgoNut");
         Food.Coffee.ore("Coffee");
         Food.OsangeOrange.ore("OsangeOrange");
         Food.Clove.ore("Clove");

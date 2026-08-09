@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagList;
 
 import binnie.Binnie;
 import binnie.botany.api.IFlower;
@@ -34,6 +35,7 @@ import binnie.core.craftgui.resource.minecraft.CraftGUITexture;
 import binnie.core.craftgui.window.Panel;
 import binnie.core.genetics.BreedingSystem;
 import binnie.core.machines.inventory.SlotValidator;
+import binnie.core.network.packet.MessageCraftGUI;
 import binnie.core.util.I18N;
 import binnie.genetics.Genetics;
 import binnie.genetics.item.GeneticsItems;
@@ -121,12 +123,12 @@ public class WindowAnalyst extends Window {
     public void initialiseClient() {
         if (isDatabase) {
             if (isMaster) {
-                setTitle(I18N.localise("genetics.item.registry.1.name"));
+                setTitle(I18N.localise("genetics.gui.registry.1.title"));
             } else {
-                setTitle(I18N.localise("genetics.item.registry.0.name"));
+                setTitle(I18N.localise("genetics.gui.registry.title"));
             }
         } else {
-            setTitle(I18N.localise("genetics.item.analyst.name"));
+            setTitle(I18N.localise("genetics.gui.analyst.title"));
         }
 
         getWindowInventory().createSlot(0);
@@ -170,11 +172,13 @@ public class WindowAnalyst extends Window {
                 x += 22;
             }
         } else {
-            new ControlSlot(this, x, y + 1).assign(InventoryType.Window, 0);
+            final NBTTagList actions = new NBTTagList();
+            new ControlSlot(this, x, y + 1).assign(actions, InventoryType.Window, 0);
             x += 22;
-            new ControlSlot(this, x, y + 1).assign(InventoryType.Window, 1);
+            new ControlSlot(this, x, y + 1).assign(actions, InventoryType.Window, 1);
             x += 26;
             setupValidators();
+            MessageCraftGUI.sendToServer(actions);
         }
         tabBar = new Control(this, x, 28.0f, w() - 16.0f - x, 20.0f);
         analystPanel = new Panel(this, 16.0f, 54.0f, 280.0f, 164.0f, MinecraftGUI.PanelType.Outline) {
@@ -275,7 +279,7 @@ public class WindowAnalyst extends Window {
                     244.0f,
                     80.0f,
                     Position.BOTTOM);
-            new ControlPlayerInventory(slideUpInv, true);
+            new ControlPlayerInventory(slideUpInv, true).createAndRegister();
             slideUpInv.setSlide(false);
         }
         addEventHandler(new EventKey.Down.Handler() {
@@ -297,7 +301,7 @@ public class WindowAnalyst extends Window {
                 @Override
                 public void initialise() {
                     new ControlTextCentered(this, 20.0f, I18N.localise("genetics.gui.analyst.info")).setColor(0x444444);
-                    new ControlPlayerInventory(this);
+                    new ControlPlayerInventory(this).createAndRegister();
                 }
             };
         }

@@ -235,11 +235,11 @@ public class Widget implements IWidget {
 
     @Override
     public void callEvent(Event event) {
-        getSuperParent().recieveEvent(event);
+        getSuperParent().receiveEvent(event);
     }
 
     @Override
-    public void recieveEvent(Event event) {
+    public void receiveEvent(Event event) {
         for (EventHandler handler : globalEventHandlers) {
             if (handler.handles(event)) {
                 handler.onEvent(event);
@@ -248,7 +248,7 @@ public class Widget implements IWidget {
 
         try {
             for (IWidget child : getWidgets()) {
-                child.recieveEvent(event);
+                child.receiveEvent(event);
             }
         } catch (ConcurrentModificationException e) {
             // ignored
@@ -306,17 +306,22 @@ public class Widget implements IWidget {
         }
 
         onUpdateClient();
-        List<IWidget> deletedWidgets = new ArrayList<>();
+        List<IWidget> deletedWidgets = null;
         for (IWidget widget : getWidgets()) {
             if (widget.hasAttribute(WidgetAttribute.NEEDS_DELETION)) {
+                if (deletedWidgets == null) {
+                    deletedWidgets = new ArrayList<>();
+                }
                 deletedWidgets.add(widget);
             } else {
                 widget.updateClient();
             }
         }
 
-        for (IWidget widget : deletedWidgets) {
-            deleteChild(widget);
+        if (deletedWidgets != null) {
+            for (IWidget widget : deletedWidgets) {
+                deleteChild(widget);
+            }
         }
     }
 

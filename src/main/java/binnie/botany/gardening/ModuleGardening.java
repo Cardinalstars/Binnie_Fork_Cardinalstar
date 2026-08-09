@@ -12,7 +12,6 @@ import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-import binnie.Binnie;
 import binnie.botany.Botany;
 import binnie.botany.CreativeTabBotany;
 import binnie.botany.api.EnumAcidity;
@@ -37,6 +36,7 @@ import binnie.core.block.ItemMetadata;
 import binnie.core.block.ItemMetadataRenderer;
 import binnie.core.block.MultipassItemRenderer;
 import binnie.core.block.TileEntityMetadata;
+import binnie.core.item.ItemMisc;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class ModuleGardening implements IInitializable {
@@ -75,7 +75,7 @@ public class ModuleGardening implements IInitializable {
         Botany.trowelIron = new ItemTrowel(Item.ToolMaterial.IRON, "Iron");
         Botany.trowelDiamond = new ItemTrowel(Item.ToolMaterial.EMERALD, "Diamond");
         Botany.trowelGold = new ItemTrowel(Item.ToolMaterial.GOLD, "Gold");
-        Botany.misc = Binnie.Item.registerMiscItems(BotanyItems.values(), CreativeTabBotany.instance);
+        Botany.misc = new ItemMisc(CreativeTabBotany.instance, BotanyItems.values());
         Botany.pigment = new ItemPigment();
         Botany.clay = new ItemClay();
 
@@ -109,7 +109,7 @@ public class ModuleGardening implements IInitializable {
 
         for (boolean manual : new boolean[] { true, false }) {
             for (boolean fertilised : new boolean[] { true, false }) {
-                for (EnumMoisture moist : EnumMoisture.values()) {
+                for (EnumMoisture moist : EnumMoisture.VALUES) {
                     ItemStack icon = (moist == EnumMoisture.DRY) ? yellow
                             : ((moist == EnumMoisture.NORMAL) ? red : blue);
                     int insulate = 2 - moist.ordinal();
@@ -258,7 +258,7 @@ public class ModuleGardening implements IInitializable {
         GameRegistry
                 .addRecipe(BotanyItems.Mortar.get(6), " c ", "cgc", " c ", 'c', Items.clay_ball, 'g', Blocks.gravel);
 
-        for (EnumFlowerColor c : EnumFlowerColor.values()) {
+        for (EnumFlowerColor c : EnumFlowerColor.VALUES) {
             ItemStack clay = new ItemStack(Botany.clay, 1, c.ordinal());
             ItemStack pigment = new ItemStack(Botany.pigment, 1, c.ordinal());
             GameRegistry.addShapelessRecipe(clay, Items.clay_ball, Items.clay_ball, Items.clay_ball, pigment);
@@ -276,9 +276,9 @@ public class ModuleGardening implements IInitializable {
             return null;
         }
         return new ItemStack(
-                Gardening.getSoilBlock(EnumSoilType.values()[type]),
+                Gardening.getSoilBlock(EnumSoilType.VALUES[type]),
                 1,
-                BlockSoil.getMeta(EnumAcidity.values()[pH], EnumMoisture.values()[moisture]));
+                BlockSoil.getMeta(EnumAcidity.VALUES[pH], EnumMoisture.VALUES[moisture]));
     }
 
     private void addAcidFertiliser(ItemStack stack, int strengthMax) {

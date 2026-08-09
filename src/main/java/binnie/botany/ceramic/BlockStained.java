@@ -34,6 +34,7 @@ public class BlockStained extends Block implements IBlockMetadata {
 
     public BlockStained() {
         super(Material.glass);
+        setHardness(0.3f);
         setCreativeTab(CreativeTabBotany.instance);
         setBlockName("stained");
     }
@@ -123,7 +124,7 @@ public class BlockStained extends Block implements IBlockMetadata {
 
     @Override
     public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> itemList) {
-        for (EnumFlowerColor c : EnumFlowerColor.values()) {
+        for (EnumFlowerColor c : EnumFlowerColor.VALUES) {
             itemList.add(TileEntityMetadata.getItemStack(this, c.ordinal()));
         }
     }

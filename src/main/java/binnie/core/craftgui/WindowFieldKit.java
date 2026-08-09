@@ -12,6 +12,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 import binnie.Binnie;
 import binnie.core.AbstractMod;
@@ -33,6 +34,7 @@ import binnie.core.craftgui.resource.minecraft.CraftGUITexture;
 import binnie.core.craftgui.resource.minecraft.PaddedTexture;
 import binnie.core.craftgui.resource.minecraft.StandardTexture;
 import binnie.core.machines.inventory.SlotValidator;
+import binnie.core.network.packet.MessageCraftGUI;
 import binnie.core.util.I18N;
 import binnie.extrabees.core.ExtraBeeTexture;
 import binnie.extrabees.gui.ExtraBeeGUITexture;
@@ -113,20 +115,26 @@ public class WindowFieldKit extends Window {
 
     @Override
     public void initialiseClient() {
+        final NBTTagList actions = new NBTTagList();
+
         setTitle(getName());
         CraftGUI.render.stylesheet(new StyleSheetPunnett());
         getWindowInventory().createSlot(0);
         getWindowInventory().createSlot(1);
         setupValidators();
-        new ControlPlayerInventory(this);
+        new ControlPlayerInventory(this).create(actions);
         IPoint handGlass = new IPoint(16.0f, 32.0f);
         GlassControl = new ControlImage(
                 this,
                 handGlass.x(),
                 handGlass.y(),
                 new StandardTexture(0, 160, 96, 96, ExtraBeeTexture.GUIPunnett));
-        new ControlSlot(this, handGlass.x() + 54.0f, handGlass.y() + 26.0f).assign(InventoryType.Window, 0);
-        new ControlSlot(this, 208.0f, 8.0f).assign(InventoryType.Window, 1);
+
+        new ControlSlot(this, handGlass.x() + 54.0f, handGlass.y() + 26.0f).assign(actions, InventoryType.Window, 0);
+        new ControlSlot(this, 208.0f, 8.0f).assign(actions, InventoryType.Window, 1);
+
+        MessageCraftGUI.sendToServer(actions);
+
         (text = new ControlText(this, new IPoint(232.0f, 13.0f), I18N.localise("binniecore.gui.tooltip.paper")))
                 .setColor(0x222222);
         (text = new ControlText(this, new IArea(0.0f, 120.0f, w(), 24.0f), "", TextJustification.MIDDLE_CENTER))
@@ -180,7 +188,9 @@ public class WindowFieldKit extends Window {
         glassOffsetX *= 1.0f - analyseProgress;
         glassOffsetY += glassVY;
         glassOffsetY *= 1.0f - analyseProgress;
-        GlassControl.setOffset(new IPoint(glassOffsetX, glassOffsetY));
+        if (GlassControl != null) {
+            GlassControl.setOffset(new IPoint(glassOffsetX, glassOffsetY));
+        }
     }
 
     private void refreshSpecies() {
@@ -285,8 +295,8 @@ public class WindowFieldKit extends Window {
     }
 
     @Override
-    public void recieveGuiNBT(Side side, EntityPlayer player, String name, NBTTagCompound nbt) {
-        super.recieveGuiNBT(side, player, name, nbt);
+    public void receiveGuiNBT(Side side, EntityPlayer player, String name, NBTTagCompound nbt) {
+        super.receiveGuiNBT(side, player, name, nbt);
         if (side != Side.SERVER || !name.equals("analyse")) {
             return;
         }

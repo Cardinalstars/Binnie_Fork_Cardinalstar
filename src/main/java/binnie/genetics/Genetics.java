@@ -1,18 +1,25 @@
 package binnie.genetics;
 
-import net.minecraft.item.Item;
+import com.gtnewhorizon.gtnhlib.config.ConfigException;
+import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 
 import binnie.core.AbstractMod;
 import binnie.core.Tags;
 import binnie.core.gui.IBinnieGUID;
+import binnie.core.item.ItemMisc;
 import binnie.core.machines.MachineGroup;
 import binnie.core.network.BinniePacketHandler;
 import binnie.core.network.IPacketID;
 import binnie.core.proxy.IProxyCore;
+import binnie.genetics.config.GeneticsConfig;
 import binnie.genetics.core.GeneticsGUI;
 import binnie.genetics.core.GeneticsPacket;
 import binnie.genetics.item.ItemAnalyst;
 import binnie.genetics.item.ItemDatabase;
+import binnie.genetics.item.ItemMasterRegistry;
+import binnie.genetics.item.ItemRegistry;
+import binnie.genetics.item.ItemSequence;
+import binnie.genetics.item.ItemSerum;
 import binnie.genetics.item.ItemSerumArray;
 import binnie.genetics.item.ModuleItem;
 import binnie.genetics.machine.ModuleMachine;
@@ -25,12 +32,14 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(
-        modid = "Genetics",
+        modid = Genetics.GENETICS_MODID,
         name = "Genetics",
         version = Tags.VERSION,
         useMetadata = true,
         dependencies = "after:BinnieCore")
 public class Genetics extends AbstractMod {
+
+    public static final String GENETICS_MODID = "Genetics";
 
     @Mod.Instance("Genetics")
     public static Genetics instance;
@@ -38,18 +47,28 @@ public class Genetics extends AbstractMod {
     @SidedProxy(clientSide = "binnie.genetics.proxy.ProxyClient", serverSide = "binnie.genetics.proxy.ProxyServer")
     public static Proxy proxy;
 
-    public static ItemSerumArray itemSerumArray = null;
+    static {
+        try {
+            ConfigurationManager.registerConfig(GeneticsConfig.class);
+        } catch (ConfigException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static final String CHANNEL = "GEN";
-    public static Item itemGenetics;
-    public static Item itemSerum;
-    public static Item itemSequencer;
+
+    public static ItemSerumArray itemSerumArray = null;
+    public static ItemMisc itemGenetics;
+    public static ItemSerum itemSerum;
+    public static ItemSequence itemSequencer;
+    public static ItemDatabase database;
+    public static ItemAnalyst analyst;
+    public static ItemRegistry registry;
+    public static ItemMasterRegistry masterRegistry;
+
     public static MachineGroup packageGenetic;
     public static MachineGroup packageAdvGenetic;
     public static MachineGroup packageLabMachine;
-    public static ItemDatabase database;
-    public static ItemAnalyst analyst;
-    public static Item registry;
-    public static Item masterRegistry;
 
     public Genetics() {
         Genetics.instance = this;

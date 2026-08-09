@@ -58,7 +58,7 @@ public interface ILogType {
         Rosewood("rosewood", 0x998666, PlankType.ExtraTreePlanks.Rosewood),
         Purpleheart("purpleheart", 0x9392a2, PlankType.ExtraTreePlanks.Purpleheart),
         Iroko("iroko", 0x605c5b, PlankType.ExtraTreePlanks.Iroko),
-        Gingko("gingko", 0xadae9c, PlankType.ExtraTreePlanks.Gingko),
+        Ginkgo("ginkgo", 0xadae9c, PlankType.ExtraTreePlanks.Ginkgo),
         Eucalyptus("eucalyptus", 0xeadeda, PlankType.ExtraTreePlanks.Eucalyptus),
         Eucalyptus2("eucalyptus", 0x867e65, PlankType.ExtraTreePlanks.Eucalyptus),
         Box("box", 0xab6f57, PlankType.ExtraTreePlanks.Box),
@@ -67,6 +67,10 @@ public interface ILogType {
         Cinnamon("cinnamon", 0x86583c, PlankType.VanillaPlanks.JUNGLE),
         PinkIvory("pinkivory", 0x7f6554, PlankType.ExtraTreePlanks.PinkIvory);
 
+        /**
+         * Cached values() array for frequent read-only operations, the array should NOT be mutated.
+         */
+        public static final ExtraTreeLog[] VALUES = values();
         private final String name;
         private final int color;
         private final IDesignMaterial plank;
@@ -86,7 +90,7 @@ public interface ILogType {
         }
 
         public static void registerIcons(IIconRegister register) {
-            for (ExtraTreeLog log : values()) {
+            for (ExtraTreeLog log : VALUES) {
                 log.trunk = ExtraTrees.proxy.getIcon(register, "logs/" + log.toString().toLowerCase() + "Trunk");
                 log.bark = ExtraTrees.proxy.getIcon(register, "logs/" + log.toString().toLowerCase() + "Bark");
             }

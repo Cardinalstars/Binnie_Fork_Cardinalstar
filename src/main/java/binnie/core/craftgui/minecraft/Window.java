@@ -48,11 +48,12 @@ import binnie.core.resource.ResourceType;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public abstract class Window extends TopLevelWidget implements INetwork.RecieveGuiNBT {
+public abstract class Window extends TopLevelWidget implements INetwork.ReceiveGuiNBT {
 
     protected float titleButtonLeft;
     protected float titleButtonRight;
     private GuiCraftGUI gui;
+    private Renderer renderer;
     private final ContainerCraftGUI container;
     private final WindowInventory windowInventory;
     private ControlText title;
@@ -83,8 +84,8 @@ public abstract class Window extends TopLevelWidget implements INetwork.RecieveG
             ControlSlot.highlighting.put(h, new ArrayList<>());
         }
 
-        CraftGUI.render = new Renderer(gui);
-        CraftGUI.render.stylesheet(StyleSheetManager.getDefault());
+        renderer = new Renderer(gui);
+        renderer.stylesheet(StyleSheetManager.getDefault());
         titleButtonLeft = -14.0f;
 
         if (showHelpButton()) {
@@ -195,6 +196,9 @@ public abstract class Window extends TopLevelWidget implements INetwork.RecieveG
     }
 
     public void initGui() {
+
+        CraftGUI.render = renderer;
+
         if (hasBeenInitialised) {
             return;
         }
@@ -267,7 +271,9 @@ public abstract class Window extends TopLevelWidget implements INetwork.RecieveG
         entityInventory = inventory;
     }
 
-    public void onClose() {}
+    public void onClose() {
+        CraftGUI.render = null;
+    }
 
     public boolean isServer() {
         return !isClient();
@@ -291,7 +297,7 @@ public abstract class Window extends TopLevelWidget implements INetwork.RecieveG
     }
 
     @Override
-    public void recieveGuiNBT(Side side, EntityPlayer player, String name, NBTTagCompound nbt) {
+    public void receiveGuiNBT(Side side, EntityPlayer player, String name, NBTTagCompound nbt) {
         if (side == Side.CLIENT && name.equals("username")) {
             float w = w();
             float titleButtonRight = this.titleButtonRight + 16.0f;

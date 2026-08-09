@@ -2,9 +2,11 @@ package binnie.genetics.craftgui;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.nbt.NBTTagList;
 
 import binnie.core.AbstractMod;
 import binnie.core.craftgui.geometry.Position;
+import binnie.core.craftgui.minecraft.InventoryType;
 import binnie.core.craftgui.minecraft.Window;
 import binnie.core.craftgui.minecraft.control.ControlEnergyBar;
 import binnie.core.craftgui.minecraft.control.ControlErrorState;
@@ -13,6 +15,7 @@ import binnie.core.craftgui.minecraft.control.ControlSlot;
 import binnie.core.craftgui.minecraft.control.ControlSlotArray;
 import binnie.core.craftgui.resource.Texture;
 import binnie.core.craftgui.resource.minecraft.StandardTexture;
+import binnie.core.network.packet.MessageCraftGUI;
 import binnie.core.util.I18N;
 import binnie.extrabees.core.ExtraBeeTexture;
 import binnie.genetics.Genetics;
@@ -40,22 +43,28 @@ public class WindowAcclimatiser extends WindowMachine {
     @Override
     public void initialiseClient() {
         super.initialiseClient();
+
+        final NBTTagList actions = new NBTTagList();
+
         int x = 59;
         int y = 32;
-        new ControlSlotArray(this, x, y, 2, 2).create(Acclimatiser.SLOT_RESERVE);
+        new ControlSlotArray(this, x, y, 2, 2).create(actions, InventoryType.Machine, Acclimatiser.SLOT_RESERVE);
         x += 54;
-        new ControlSlot(this, x + 18, y).assign(Acclimatiser.SLOT_TARGET);
-        new ControlSlotArray(this, x, y + 18 + 18, 3, 1).create(Acclimatiser.SLOT_ACCLIMATISER);
+        new ControlSlot(this, x + 18, y).assign(actions, InventoryType.Machine, Acclimatiser.SLOT_TARGET);
+        new ControlSlotArray(this, x, y + 18 + 18, 3, 1)
+                .create(actions, InventoryType.Machine, Acclimatiser.SLOT_ACCLIMATISER);
         x += 72;
-        new ControlSlotArray(this, x, y, 2, 2).create(Acclimatiser.SLOT_DONE);
+        new ControlSlotArray(this, x, y, 2, 2).create(actions, InventoryType.Machine, Acclimatiser.SLOT_DONE);
         new ControlEnergyBar(this, 21, 115, 16, 60, Position.BOTTOM);
         new ControlErrorState(this, 181.0f, 83.0f);
-        new ControlPlayerInventory(this);
+        new ControlPlayerInventory(this).create(actions);
+
+        MessageCraftGUI.sendToServer(actions);
     }
 
     @Override
     public String getTitle() {
-        return I18N.localise("genetics.machine.labMachine.acclimatiser");
+        return I18N.localise("gui.genetics.machine.labMachine.acclimatiser.title");
     }
 
     @Override

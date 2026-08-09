@@ -1,6 +1,5 @@
 package binnie.core.machines;
 
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.tileentity.TileEntity;
 
 import binnie.core.util.I18N;
@@ -32,6 +31,11 @@ public abstract class MachinePackage {
         return I18N.localise(group.getMod().getModID() + ".machine." + group.getShortUID() + "." + getUID());
     }
 
+    public String getGuiDisplayName() {
+        String guiKey = group.getMod().getModID() + ".machine." + group.getShortUID() + "." + getUID() + ".title";
+        return I18N.canLocalise(guiKey) ? I18N.localise(guiKey) : getDisplayName();
+    }
+
     public Integer getMetadata() {
         return metadata;
     }
@@ -48,8 +52,7 @@ public abstract class MachinePackage {
         this.group = group;
     }
 
-    public abstract void renderMachine(Machine machine, double x, double y, double z, float partialTick,
-            RenderBlocks renderer);
+    public abstract void renderMachine(Machine machine, double x, double y, double z, float partialTick);
 
     public boolean isActive() {
         return active;

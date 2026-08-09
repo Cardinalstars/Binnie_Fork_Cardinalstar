@@ -28,7 +28,7 @@ public class ModuleItems implements IInitializable {
 
     @Override
     public void preInit() {
-        ExtraTrees.itemMisc = Binnie.Item.registerMiscItems(ExtraTreeItems.values(), Tabs.tabArboriculture);
+        ExtraTrees.itemMisc = new ItemMisc(Tabs.tabArboriculture, ExtraTreeItems.values());
         ExtraTrees.itemDictionary = new ItemDictionary();
         if (BinnieCore.isLepidopteryActive()) {
             ExtraTrees.itemDictionaryLepi = new ItemMothDatabase();
@@ -84,7 +84,7 @@ public class ModuleItems implements IInitializable {
         Food.Acorn.addOil(20, 50, 3);
         Food.Elderberry.addJuice(10, 100, 5);
         Food.Olive.addOil(20, 50, 3);
-        Food.GingkoNut.addOil(20, 50, 5);
+        Food.GinkgoNut.addOil(20, 50, 5);
         Food.Coffee.addOil(15, 20, 2);
         Food.OsangeOrange.addJuice(10, 300, 15);
         Food.Clove.addOil(10, 25, 2);
@@ -233,7 +233,7 @@ public class ModuleItems implements IInitializable {
         FuelManager.bronzeEngineFuel.put(
                 ExtraTreeLiquid.Resin.get(1).getFluid(),
                 new EngineBronzeFuel(ExtraTreeLiquid.Resin.get(1).getFluid(), 30, 10000, 1));
-        for (ILogType.ExtraTreeLog log : ILogType.ExtraTreeLog.values()) {
+        for (ILogType.ExtraTreeLog log : ILogType.ExtraTreeLog.VALUES) {
             log.addRecipe();
         }
     }

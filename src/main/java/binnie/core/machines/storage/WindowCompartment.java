@@ -15,6 +15,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 import binnie.core.AbstractMod;
 import binnie.core.BinnieCore;
@@ -42,6 +43,7 @@ import binnie.core.craftgui.geometry.Position;
 import binnie.core.craftgui.minecraft.Dialog;
 import binnie.core.craftgui.minecraft.EnumColor;
 import binnie.core.craftgui.minecraft.IWindowAffectsShiftClick;
+import binnie.core.craftgui.minecraft.InventoryType;
 import binnie.core.craftgui.minecraft.MinecraftGUI;
 import binnie.core.craftgui.minecraft.Window;
 import binnie.core.craftgui.minecraft.control.ControlItemDisplay;
@@ -55,6 +57,7 @@ import binnie.core.craftgui.resource.minecraft.CraftGUITexture;
 import binnie.core.craftgui.window.Panel;
 import binnie.core.machines.Machine;
 import binnie.core.machines.transfer.TransferRequest;
+import binnie.core.network.packet.MessageCraftGUI;
 import binnie.core.util.I18N;
 import binnie.genetics.craftgui.WindowMachine;
 import cpw.mods.fml.relauncher.Side;
@@ -80,7 +83,7 @@ public class WindowCompartment extends WindowMachine implements IWindowAffectsSh
 
     @Override
     public void initialiseClient() {
-        setTitle(Machine.getMachine(getInventory()).getPackage().getDisplayName());
+        setTitle(Machine.getMachine(getInventory()).getPackage().getGuiDisplayName());
         int x = 16;
         int y = 32;
         ComponentCompartmentInventory inv = Machine.getMachine(getInventory())
@@ -170,6 +173,7 @@ public class WindowCompartment extends WindowMachine implements IWindowAffectsSh
         }
         CraftGUIUtil.linkWidgets(tab, compartmentPages);
         int i = 0;
+        final NBTTagList actions = new NBTTagList();
         for (int p2 = 0; p2 < inv.getTabNumber(); ++p2) {
             ControlPage thisPage = page[p2];
             Panel panel = new Panel(thisPage, 0.0f, 0.0f, thisPage.w(), thisPage.h(), MinecraftGUI.PanelType.Black) {
@@ -187,8 +191,11 @@ public class WindowCompartment extends WindowMachine implements IWindowAffectsSh
             for (int k = 0; k < inv.getPageSize(); ++k) {
                 slotsIDs[k] = i++;
             }
-            new ControlSlotArray(thisPage, 8, 8, inv.getPageSize() / 5, 5).create(slotsIDs);
+
+            new ControlSlotArray(thisPage, 8, 8, inv.getPageSize() / 5, 5)
+                    .create(actions, InventoryType.Machine, slotsIDs);
         }
+        MessageCraftGUI.sendToServer(actions);
         x += compartmentPageWidth;
         if (tabs2.length > 0) {
             ControlTabBar<Integer> tab2 = new ControlTabBar<Integer>(
@@ -245,12 +252,12 @@ public class WindowCompartment extends WindowMachine implements IWindowAffectsSh
 
         setSize(new IPoint(Math.max(32 + compartmentWidth, 252), h()));
         controlCompartment.setPosition(new IPoint((w() - controlCompartment.w()) / 2.0f, controlCompartment.y()));
-        new ControlPlayerInventory(this, true);
+        new ControlPlayerInventory(this, true).createAndRegister();
         ControlSlide slide = new ControlSlide(this, 0.0f, 134.0f, 136.0f, 92.0f, Position.LEFT);
         slide.setLabel(I18N.localise("binniecore.machine.storage.tab.properties"));
         slide.setSlide(false);
-        slide.addHelp(I18N.localise("binniecore.machine.storage.tooltip.properties"));
-        slide.addHelp(I18N.localise("binniecore.machine.storage.tooltip.properties.desc"));
+        slide.addHelp(I18N.localise("binniecore.machine.storage.tab.properties"));
+        slide.addHelp(I18N.localise("binniecore.machine.storage.tab.properties.desc"));
         Panel tabPropertyPanel = new Panel(slide, 16.0f, 8.0f, 112.0f, 76.0f, MinecraftGUI.PanelType.Gray);
         int y2 = 4;
         new ControlText(tabPropertyPanel, new IPoint(4.0f, y2), I18N.localise("binniecore.machine.storage.tab.name"));
@@ -313,7 +320,7 @@ public class WindowCompartment extends WindowMachine implements IWindowAffectsSh
                     1 + cw * (cc / 8),
                     cw,
                     cw,
-                    EnumColor.values()[cc]);
+                    EnumColor.VALUES[cc]);
             color.addSelfEventHandler(new EventMouse.Down.Handler() {
 
                 @Override
@@ -367,7 +374,7 @@ public class WindowCompartment extends WindowMachine implements IWindowAffectsSh
                 };
                 slotGrid = new Control(scroll, 1.0f, 1.0f, 108.0f, 18.0f);
                 scroll.setScrollableContent(slotGrid);
-                new ControlPlayerInventory(this, true);
+                new ControlPlayerInventory(this, true).createAndRegister();
                 new ControlTextEdit(this, 16.0f, 16.0f, 100.0f, 14.0f).addEventHandler(new EventTextEdit.Handler() {
 
                     @Override
@@ -459,14 +466,18 @@ public class WindowCompartment extends WindowMachine implements IWindowAffectsSh
                 slotGrid.deleteAllChildren();
                 slotGrid.setSize(new IPoint(width, height));
 
+                final NBTTagList actions = new NBTTagList();
+
                 for (int k : slotIds.keySet()) {
-                    new ControlSlot(slotGrid, x, y).assign(k);
+                    new ControlSlot(slotGrid, x, y).assign(actions, InventoryType.Machine, k);
                     x += 18;
                     if (x >= 108) {
                         x = 0;
                         y += 18;
                     }
                 }
+
+                MessageCraftGUI.sendToServer(actions);
 
                 while (y < 108 || x != 0) {
                     new ControlSlot(slotGrid, x, y);
@@ -488,14 +499,16 @@ public class WindowCompartment extends WindowMachine implements IWindowAffectsSh
 
     public void updateTabs() {
         CompartmentTab tab = getCurrentTab();
-        tabName.setValue(tab.getName());
+        if (!tabName.isFocused()) {
+            tabName.setValue(tab.getName());
+        }
         tabIcon.setItemStack(tab.getIcon());
         tabColour.setValue(tab.getColor());
     }
 
     @Override
-    public void recieveGuiNBT(Side side, EntityPlayer player, String name, NBTTagCompound nbt) {
-        super.recieveGuiNBT(side, player, name, nbt);
+    public void receiveGuiNBT(Side side, EntityPlayer player, String name, NBTTagCompound nbt) {
+        super.receiveGuiNBT(side, player, name, nbt);
         if (name.equals("tab-change")) {
             currentTab = nbt.getByte("i");
         }
