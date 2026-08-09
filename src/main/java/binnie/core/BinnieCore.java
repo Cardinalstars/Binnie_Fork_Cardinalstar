@@ -3,6 +3,7 @@ package binnie.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
@@ -99,6 +100,11 @@ public class BinnieCore extends AbstractMod {
         postInit();
     }
 
+    @Mod.EventHandler
+    public void loadComplete(FMLLoadCompleteEvent event) {
+        proxy.registerWailaHandler();
+    }
+    
     @Override
     public IBinnieGUID[] getGUIDs() {
         return BinnieCoreGUI.values();
@@ -125,7 +131,7 @@ public class BinnieCore extends AbstractMod {
         RenderingRegistry.registerBlockHandler(new MultipassBlockRenderer());
         GameRegistry.registerTileEntity(TileEntityMetadata.class, "binnie.tile.metadata");
     }
-
+    
     public static boolean isLepidopteryActive() {
         return PluginManager.Module.LEPIDOPTEROLOGY.isEnabled();
     }

@@ -3,6 +3,7 @@ package binnie.extratrees;
 import static binnie.extratrees.ExtraTrees.EB_MOD_NAME;
 import static binnie.extratrees.ExtraTrees.ET_MODID;
 
+import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraft.block.Block;
 
 import com.gtnewhorizon.gtnhlib.config.ConfigException;

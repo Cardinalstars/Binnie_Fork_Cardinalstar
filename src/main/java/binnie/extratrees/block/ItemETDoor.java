@@ -59,6 +59,15 @@ public class ItemETDoor extends ItemMetadata {
             block.onPostBlockPlaced(world, x, y, z, meta);
         }
 
+        if (world.getBlock(x, y + 1, z) == block) {
+            TileEntityMetadata tile = TileEntityMetadata.getTile(world, x, y + 1, z);
+            if (tile != null) {
+                tile.setTileMetadata(TileEntityMetadata.getItemDamage(item), false);
+            }
+            block.onBlockPlacedBy(world, x, y + 1, z, player, item);
+            block.onPostBlockPlaced(world, x, y + 1, z, meta);
+        }
+        
         world.notifyBlocksOfNeighborChange(x, y, z, block);
         world.notifyBlocksOfNeighborChange(x, y + 1, z, block);
     }

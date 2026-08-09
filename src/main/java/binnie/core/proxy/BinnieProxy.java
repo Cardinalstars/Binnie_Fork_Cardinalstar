@@ -2,6 +2,7 @@ package binnie.core.proxy;
 
 import java.io.File;
 
+import binnie.core.walia.BinnieProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -58,6 +59,12 @@ public class BinnieProxy extends BinnieModProxy implements IBinnieProxy {
     @Override
     public void registerCustomItemRenderer(Item item, IItemRenderer itemRenderer) {}
 
+    @Override
+    public void registerWailaHandler()
+    {
+        BinnieProvider.register();
+    }
+    
     @Override
     public boolean needsTagCompoundSynched(Item item) {
         return item.getShareTag();

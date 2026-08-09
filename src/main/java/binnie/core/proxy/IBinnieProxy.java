@@ -30,7 +30,9 @@ public interface IBinnieProxy extends IProxyCore {
     int getUniqueRenderID();
 
     void registerCustomItemRenderer(Item item, IItemRenderer itemRenderer);
-
+    
+    void registerWailaHandler();
+    
     void openGui(AbstractMod mod, int id, EntityPlayer player, int x, int y, int z);
 
     boolean isSimulating(World world);

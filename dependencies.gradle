@@ -3,7 +3,10 @@
 dependencies {
     api('com.github.GTNewHorizons:ForestryMC:4.11.32:dev')
     implementation('com.github.GTNewHorizons:GTNHLib:0.11.35:dev')
-
+    
+    implementation("com.github.GTNewHorizons:waila:1.19.31:dev")
+    compileOnly("com.github.GTNewHorizons:waila:1.19.31:sources")
+    
     devOnlyNonPublishable('com.github.GTNewHorizons:NotEnoughItems:2.8.118-GTNH:dev')
 
     compileOnly('com.github.GTNewHorizons:BuildCraft:7.1.63:api')
